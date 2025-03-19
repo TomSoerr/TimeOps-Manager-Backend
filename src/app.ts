@@ -1,20 +1,16 @@
-import express from 'express';
-import { setRoutes } from './routes/index';
-import { connectToDatabase } from './config/database';
+import express, { Router, RequestHandler, ErrorRequestHandler } from "express";
+import apiRouter from "./routes/apiRouter";
+import errorController from "./controllers/errorController";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use("/api/v1", apiRouter);
 
-// Connect to PostgreSQL database
-connectToDatabase();
+app.use(errorController.notFound);
+app.use(errorController.handleError);
 
-// Set up routes
-setRoutes(app);
+const PORT = process.env.PORT || 5173;
 
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`App started on port: ${PORT}!`);
 });
