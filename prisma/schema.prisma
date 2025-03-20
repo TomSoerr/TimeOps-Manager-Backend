@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Color {
+  slate   // Default value for "No Project"
+  red
+  amber
+  lime
+  emerald
+  cyan
+  blue
+  violet
+  fuchsia
+}
+
+model User {
+  id        Int      @id @default(autoincrement()) 
+  apiToken  String   @unique                      
+  entries   Entry[]                               
+  tags      Tag[]                                 // Relation to tags
+}
+
+model Entry {
+  id          Int      @id @default(autoincrement())  
+  name        String       
+  startTimeUtc Int
+  endTimeUtc   Int     
+  tagId       Int
+  tag         Tag      @relation(fields: [tagId], references: [id])                    
+  createdAt   DateTime @default(now())
+  editedAt    DateTime @updatedAt
+  userId      Int                                   
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model Tag {
+  id        Int      @id @default(autoincrement()) 
+  name      String
+  color     Color    @default(slate)  
+  entries   Entry[]            
+  userId    Int                                   // Foreign key to User
+  user      User     @relation(fields: [userId], references: [id]) // Relation to User
+}

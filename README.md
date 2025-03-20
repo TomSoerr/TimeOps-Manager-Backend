@@ -23,3 +23,14 @@
 | POST                   | `/api/v1/db`                  | Import CSV file from Toggl or JSON file from Time Ops Manager |
 | GET                    | `/api/v1/db`                  | Export database to JSON                                       |
 | GET                    | `/api/v1/db/seed`             | Seed database                                                 |
+
+# Help
+
+docker ps
+
+list all active docker containers
+
+
+# TODO
+
+use TRIM for SSD
