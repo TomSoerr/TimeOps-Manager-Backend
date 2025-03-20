@@ -4,6 +4,7 @@ import entriesRouter from "./entriesRouter";
 import tagsRouter from "./tagsRouter";
 import analyticsRouter from "./analyticsRouter";
 import dbRouter from "./dbRouter";
+import userRouter from "./userRouter";
 
 const apiRouter = Router();
 
@@ -15,5 +16,6 @@ apiRouter.use("/entries", entriesRouter);
 apiRouter.use("/tags", tagsRouter);
 apiRouter.use("/analytics", analyticsRouter);
 apiRouter.use("/db", dbRouter);
+apiRouter.use("/user", userRouter);
 
 export default apiRouter;
