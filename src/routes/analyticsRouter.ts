@@ -1,10 +1,15 @@
-import { Router } from "express";
-import analyticsController from "../controllers/analyticsController";
+import { Router } from 'express';
+import analyticsController from '../controllers/analyticsController';
 
+/**
+ * The `analyticsRouter` handles routes related to analytics data.
+ * It provides endpoints for retrieving analytics and generating analytics PDFs.
+ *
+ * @category Routers
+ */
 const analyticsRouter = Router();
 
-// Tags Management
-analyticsRouter.get("/", analyticsController.getAnalytics);
-analyticsRouter.get("/", analyticsController.getAnalyticsPdf);
+analyticsRouter.get('/', analyticsController.getAnalytics);
+analyticsRouter.get('/', analyticsController.getAnalyticsPdf);
 
 export default analyticsRouter;

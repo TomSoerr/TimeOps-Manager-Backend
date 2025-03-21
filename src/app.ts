@@ -8,6 +8,11 @@ import fs from 'fs';
 import cors from 'cors';
 import errorController from './controllers/errorController';
 
+/**
+ * The main Express application instance. The instance mounts the `apiRouter`.
+ *
+ * @category App
+ */
 const app = express();
 
 app.use(
@@ -36,3 +41,5 @@ const PORT = process.env.PORT || 3000;
 https.createServer(httpsOptions, app).listen(PORT, () => {
   console.log(`HTTPS server started on port: ${PORT}!`);
 });
+
+export default app;

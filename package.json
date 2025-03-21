@@ -9,7 +9,8 @@
     "dev:db": "sudo docker compose up -d db",
     "build": "tsc",
     "start": "node dist/app.js",
-    "test": "jest"
+    "test": "jest",
+    "docs:gen": "npx typedoc && rm -rf TimeOps-Manager-Backend.wiki/classes TimeOps-Manager-Backend.wiki/variables && mv tmp/* TimeOps-Manager-Backend.wiki/ && rm -rf tmp && rm TimeOps-Manager-Backend.wiki/README.md"
   },
   "dependencies": {
     "@prisma/client": "^6.5.0",
@@ -29,6 +30,8 @@
     "prisma": "^6.5.0",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
+    "typedoc": "^0.28.1",
+    "typedoc-plugin-markdown": "^4.5.2",
     "typescript": "^5.7.3"
   }
 }

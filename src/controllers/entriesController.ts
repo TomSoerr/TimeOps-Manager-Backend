@@ -1,25 +1,44 @@
-import expressAsyncHandler from "express-async-handler";
-import { validationResult } from "express-validator";
+import expressAsyncHandler from 'express-async-handler';
+import { validationResult } from 'express-validator';
 
+/**
+ * Controller for managing entries.
+ *
+ * @category Controllers
+ */
 const entriesController = {
-  // Get entries for last 3 months
+  /**
+   * Get entries for the last 3 months.
+   *
+   * @param req - The Express request object.
+   * @param res - The Express response object.
+   */
   getEntries: expressAsyncHandler(async (req, res) => {
-    res.json({ message: "Get entries for last 3 months" });
+    res.json({ message: 'Get entries for last 3 months' });
   }),
 
-  // Create a new entry
+  /**
+   * Create a new entry.
+   *
+   * @param req - The Express request object.
+   * @param res - The Express response object.
+   */
   createEntry: expressAsyncHandler(async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      res.status(400).json({ message: "Error creating entry", errors });
+      res.status(400).json({ message: 'Error creating entry', errors });
       return;
     }
 
-    // Implementation here
-    res.status(201).json({ message: "Entry created" });
+    res.status(201).json({ message: 'Entry created' });
   }),
 
-  // Update an entry
+  /**
+   * Update an entry.
+   *
+   * @param req - The Express request object.
+   * @param res - The Express response object.
+   */
   updateEntry: expressAsyncHandler(async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -33,24 +52,44 @@ const entriesController = {
     res.json({ message: `Entry ${id} updated` });
   }),
 
-  // Get running entry if available
+  /**
+   * Get the currently running entry, if available.
+   *
+   * @param req - The Express request object.
+   * @param res - The Express response object.
+   */
   getRunningEntry: expressAsyncHandler(async (req, res) => {
-    res.json({ message: "Get running entry" });
+    res.json({ message: 'Get running entry' });
   }),
 
-  // Start running entry
+  /**
+   * Start a new running entry.
+   *
+   * @param req - The Express request object.
+   * @param res - The Express response object.
+   */
   startRunningEntry: expressAsyncHandler(async (req, res) => {
-    res.status(201).json({ message: "Running entry started" });
+    res.status(201).json({ message: 'Running entry started' });
   }),
 
-  // End running entry
+  /**
+   * End the currently running entry.
+   *
+   * @param req - The Express request object.
+   * @param res - The Express response object.
+   */
   endRunningEntry: expressAsyncHandler(async (req, res) => {
-    res.json({ message: "Running entry ended" });
+    res.json({ message: 'Running entry ended' });
   }),
 
-  // NFC webpage
+  /**
+   * Serve the NFC webpage.
+   *
+   * @param req - The Express request object.
+   * @param res - The Express response object.
+   */
   getNfcPage: expressAsyncHandler(async (req, res) => {
-    res.send("NFC Page HTML");
+    res.send('NFC Page HTML');
   }),
 };
 

@@ -5,3 +5,8 @@ node_modules
 **/*.pem
 **/*.csr
 **/*.p12
+dist
+temp
+TimeOps-Manager-Backend.wiki
+wiki
+tmp

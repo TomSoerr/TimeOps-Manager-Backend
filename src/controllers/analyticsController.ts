@@ -1,20 +1,39 @@
-import expressAsyncHandler from "express-async-handler";
-import InternalError from "../errors/internalError";
+import expressAsyncHandler from 'express-async-handler';
+import InternalError from '../errors/internalError';
 
+/**
+ * Controller for managing analytics.
+ *
+ * @category Controllers
+ */
 const dbController = {
-  // Create report as JSON
+  /**
+   * Get analytics data as JSON.
+   *
+   * @param req - The Express request object.
+   * @param res - The Express response object.
+   *
+   
+   */
   getAnalytics: expressAsyncHandler(async (req, res) => {
-    res.json({ message: "Imported CSV/JSON to DB" });
+    res.json({ message: 'Imported CSV/JSON to DB' });
   }),
 
-  // Create report as PDF
+  /**
+   * Get analytics data as a PDF report.
+   *
+   * @param req - The Express request object.
+   * @param res - The Express response object.
+   *
+   
+   */
   getAnalyticsPdf: expressAsyncHandler(async (req, res) => {
     try {
-      const pdfPath = "/path/to/your/generated/report.pdf";
+      const pdfPath = '/path/to/your/generated/report.pdf';
 
-      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader('Content-Type', 'application/pdf');
       res.setHeader(
-        "Content-Disposition",
+        'Content-Disposition',
         'attachment; filename="analytics-report.pdf"',
       );
 
