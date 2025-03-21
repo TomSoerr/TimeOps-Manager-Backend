@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import express from 'express';
+import authMiddleware from '../middleware/authMiddleware';
 import entriesRouter from './entriesRouter';
 import tagsRouter from './tagsRouter';
 import analyticsRouter from './analyticsRouter';
@@ -24,6 +25,9 @@ const apiRouter: Router = Router();
 
 // Parse JSON body in requests
 apiRouter.use(express.json());
+
+// Apply authentication middleware
+apiRouter.use(authMiddleware);
 
 // Mount sub-routers
 apiRouter.use('/entries', entriesRouter);

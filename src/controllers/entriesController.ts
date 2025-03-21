@@ -1,5 +1,7 @@
 import expressAsyncHandler from 'express-async-handler';
 import { validationResult } from 'express-validator';
+import { createEntryForUser } from '../models/userModel';
+import sseController from './sseController';
 
 /**
  * Controller for managing entries.
@@ -30,7 +32,29 @@ const entriesController = {
       return;
     }
 
-    res.status(201).json({ message: 'Entry created' });
+    const { name, startTimeUtc, endTimeUtc, tagId } = req.body;
+    const userId = req.userId; // Retrieved from the auth middleware
+
+    if (!userId) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    try {
+      const newEntry = await createEntryForUser(userId, {
+        name,
+        startTimeUtc,
+        endTimeUtc,
+        tagId,
+      });
+
+      // Trigger an SSE event to notify all clients of the user
+      sseController.triggerEventForUser(userId);
+
+      res.status(201).json({ message: 'Entry created', entry: newEntry });
+    } catch (error) {
+      res.status(500).json({ message: 'Error creating entry', error });
+    }
   }),
 
   /**

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import entriesController from '../controllers/entriesController';
-import validateEntry from '../validators/entryValidator';
+import validateEntry from '../middleware/entryValidator';
 
 /**
  * The `entriesRouter` handles all routes related to time entries.

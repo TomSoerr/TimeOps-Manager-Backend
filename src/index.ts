@@ -37,7 +37,7 @@ export { default as dbRouter } from './routes/dbRouter';
 export { default as userRouter } from './routes/userRouter';
 export { default as sseRouter } from './routes/sseRouter';
 
-export { default as validateEntry } from './validators/entryValidator';
+export { default as validateEntry } from './middleware/entryValidator';
 
 export { default as CustomError } from './errors/customError';
 export { default as InternalError } from './errors/internalError';
