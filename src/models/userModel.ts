@@ -3,7 +3,7 @@ import prisma from '../client';
 /**
  * Retrieves the user ID associated with the provided API token.
  *
- * @category Helpers
+ * @param apiToken - The API token of the user
  */
 export async function getUserIdFromToken(
   apiToken: string,
@@ -36,5 +36,18 @@ export async function createEntryForUser(
       ...entryData,
       userId,
     },
+  });
+}
+
+/**
+ * Retrieves all entries for the specified user.
+ *
+ * @param userId - The ID of the user whose entries are to be fetched.
+ * @returns A list of entries for the user.
+ */
+export async function getEntriesForUser(userId: number) {
+  return await prisma.entry.findMany({
+    where: { userId },
+    orderBy: { startTimeUtc: 'desc' },
   });
 }

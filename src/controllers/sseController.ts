@@ -1,7 +1,5 @@
 import expressAsyncHandler from 'express-async-handler';
 import { Request, Response } from 'express';
-import { getUserIdFromToken } from '../models/userModel';
-import InternalError from '../errors/internalError';
 
 /**
  * A map to store active Server-Sent Events (SSE) clients.
@@ -30,9 +28,11 @@ const sseController = {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
+    res.write('\n'); // is needed for the onopen handler
 
     // Add the client's response object to the active clients map
     if (!clients.has(userId)) {
+      console.log(`userId ${userId} added a client`);
       clients.set(userId, []);
     }
     clients.get(userId)?.push(res);
@@ -62,7 +62,6 @@ const sseController = {
     if (userClients) {
       userClients.forEach((client) => {
         client.write(`event: data-update\n`);
-        client.write(`data: {}\n\n`); // Send an empty payload
       });
     }
   },

@@ -1,6 +1,6 @@
 import expressAsyncHandler from 'express-async-handler';
 import { validationResult } from 'express-validator';
-import { createEntryForUser } from '../models/userModel';
+import { createEntryForUser, getEntriesForUser } from '../models/userModel';
 import sseController from './sseController';
 
 /**
@@ -16,7 +16,8 @@ const entriesController = {
    * @param res - The Express response object.
    */
   getEntries: expressAsyncHandler(async (req, res) => {
-    res.json({ message: 'Get entries for last 3 months' });
+    const entries = await getEntriesForUser(req.userId);
+    res.status(200).json({ message: 'Entries fetched successfully', entries });
   }),
 
   /**
@@ -40,21 +41,17 @@ const entriesController = {
       return;
     }
 
-    try {
-      const newEntry = await createEntryForUser(userId, {
-        name,
-        startTimeUtc,
-        endTimeUtc,
-        tagId,
-      });
+    const newEntry = await createEntryForUser(userId, {
+      name,
+      startTimeUtc,
+      endTimeUtc,
+      tagId,
+    });
 
-      // Trigger an SSE event to notify all clients of the user
-      sseController.triggerEventForUser(userId);
+    // Trigger an SSE event to notify all clients of the user
+    sseController.triggerEventForUser(userId);
 
-      res.status(201).json({ message: 'Entry created', entry: newEntry });
-    } catch (error) {
-      res.status(500).json({ message: 'Error creating entry', error });
-    }
+    res.status(201).json({ message: 'Entry created', entry: newEntry });
   }),
 
   /**
