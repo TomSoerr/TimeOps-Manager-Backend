@@ -1,4 +1,5 @@
 import expressAsyncHandler from 'express-async-handler';
+import { getTagsForUser } from '../models/userModel';
 
 /**
  * Controller for managing tags.
@@ -15,7 +16,8 @@ const tagsController = {
    
    */
   getTags: expressAsyncHandler(async (req, res) => {
-    res.json({ message: 'Get all tags' });
+    const tags = await getTagsForUser(req.userId);
+    res.status(200).json({ message: 'Tags fetched successfully', tags });
   }),
 
   /**

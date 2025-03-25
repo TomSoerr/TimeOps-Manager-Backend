@@ -15,11 +15,11 @@ const entriesRouter = Router();
 entriesRouter.get('/', entriesController.getEntries);
 entriesRouter.post('/', validateEntry, entriesController.createEntry);
 entriesRouter.put('/:id', validateEntry, entriesController.updateEntry);
+entriesRouter.delete('/', entriesController.deleteAllEntries);
 
 // Running Entry
 entriesRouter.get('/running', entriesController.getRunningEntry);
 entriesRouter.post('/running', entriesController.startRunningEntry);
 entriesRouter.put('/running', entriesController.endRunningEntry);
-entriesRouter.get('/running/nfc', entriesController.getNfcPage);
 
 export default entriesRouter;

@@ -1,6 +1,11 @@
 import expressAsyncHandler from 'express-async-handler';
 import { validationResult } from 'express-validator';
-import { createEntryForUser, getEntriesForUser } from '../models/userModel';
+import {
+  createEntryForUser,
+  updateEntryForUser,
+  deleteAllEntriesForUser,
+  getEntriesForUser,
+} from '../models/userModel';
 import sseController from './sseController';
 
 /**
@@ -33,15 +38,10 @@ const entriesController = {
       return;
     }
 
-    const { name, startTimeUtc, endTimeUtc, tagId } = req.body;
     const userId = req.userId; // Retrieved from the auth middleware
+    const { name, startTimeUtc, endTimeUtc, tagId } = req.body;
 
-    if (!userId) {
-      res.status(401).json({ message: 'Unauthorized' });
-      return;
-    }
-
-    const newEntry = await createEntryForUser(userId, {
+    await createEntryForUser(userId, {
       name,
       startTimeUtc,
       endTimeUtc,
@@ -51,7 +51,7 @@ const entriesController = {
     // Trigger an SSE event to notify all clients of the user
     sseController.triggerEventForUser(userId);
 
-    res.status(201).json({ message: 'Entry created', entry: newEntry });
+    res.status(201).json({ message: 'Entry created' });
   }),
 
   /**
@@ -65,12 +65,38 @@ const entriesController = {
     if (!errors.isEmpty()) {
       res
         .status(400)
-        .json({ message: `Error updating entry ${req.params?.id}`, errors });
+        .json({ message: 'Error updating entry', errors: errors.array() });
       return;
     }
 
-    const { id } = req.params;
-    res.json({ message: `Entry ${id} updated` });
+    const userId = req.userId;
+    const entryId = parseInt(req.params.id, 10);
+
+    if (isNaN(entryId)) {
+      res.status(400).json({ message: 'Invalid entry ID' });
+      return;
+    }
+
+    const { name, startTimeUtc, endTimeUtc, tagId } = req.body;
+
+    const updatedEntry = await updateEntryForUser(userId, entryId, {
+      name,
+      startTimeUtc,
+      endTimeUtc,
+      tagId,
+    });
+
+    if (!updatedEntry) {
+      res.status(404).json({
+        message: 'Entry not found or you do not have permission to update it',
+      });
+      return;
+    }
+
+    // Trigger an SSE event to notify all clients of the user
+    sseController.triggerEventForUser(userId);
+
+    res.status(200).json({ message: 'Entry updated', entry: updatedEntry });
   }),
 
   /**
@@ -103,14 +129,11 @@ const entriesController = {
     res.json({ message: 'Running entry ended' });
   }),
 
-  /**
-   * Serve the NFC webpage.
-   *
-   * @param req - The Express request object.
-   * @param res - The Express response object.
-   */
-  getNfcPage: expressAsyncHandler(async (req, res) => {
-    res.send('NFC Page HTML');
+  deleteAllEntries: expressAsyncHandler(async (req, res) => {
+    const userId = req.userId;
+    await deleteAllEntriesForUser(userId);
+
+    sseController.triggerEventForUser(userId);
   }),
 };
 

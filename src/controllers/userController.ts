@@ -14,13 +14,12 @@ const userController = {
    * @param req - The Express request object.
    * @param res - The Express response object.
    *
-
    */
   newUser: expressAsyncHandler(async (req, res) => {
     // Generate a unique API token
     const apiToken = crypto.randomBytes(32).toString('hex');
 
-    // Create a new user in the database
+    // Move to model TODO
     const user = await prisma.user.create({
       data: {
         apiToken,

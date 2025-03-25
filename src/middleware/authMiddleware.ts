@@ -21,7 +21,7 @@ declare module 'express-serve-static-core' {
  */
 const authMiddleware = expressAsyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    if (req.path.startsWith('/api/v1/user')) {
+    if (req.path.startsWith('/user')) {
       return next(); // Skip authentication for user generation route
     }
 
