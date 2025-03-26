@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import tagsController from '../controllers/tagsController';
+import validateTag from '../middleware/validateTag';
 
 /**
  * The `tagsRouter` handles routes related to tag management.
@@ -10,7 +11,7 @@ import tagsController from '../controllers/tagsController';
 const tagsRouter = Router();
 
 tagsRouter.get('/', tagsController.getTags);
-tagsRouter.post('/', tagsController.createTag);
-tagsRouter.put('/:id', tagsController.updateTag);
+tagsRouter.post('/', validateTag, tagsController.createTag);
+tagsRouter.put('/:id', validateTag, tagsController.updateTag);
 
 export default tagsRouter;

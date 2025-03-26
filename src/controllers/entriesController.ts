@@ -41,6 +41,9 @@ const entriesController = {
     const userId = req.userId; // Retrieved from the auth middleware
     const { name, startTimeUtc, endTimeUtc, tagId } = req.body;
 
+    // TODO implement check if entry overlap
+    // errorData.errors?.errors?.[0]?.msg
+
     await createEntryForUser(userId, {
       name,
       startTimeUtc,
@@ -48,10 +51,10 @@ const entriesController = {
       tagId,
     });
 
+    res.status(201).json({ message: 'Entry created' });
+
     // Trigger an SSE event to notify all clients of the user
     sseController.triggerEventForUser(userId);
-
-    res.status(201).json({ message: 'Entry created' });
   }),
 
   /**
@@ -79,6 +82,9 @@ const entriesController = {
 
     const { name, startTimeUtc, endTimeUtc, tagId } = req.body;
 
+    // TODO implement check if entry overlap
+    // errorData.errors?.errors?.[0]?.msg
+
     const updatedEntry = await updateEntryForUser(userId, entryId, {
       name,
       startTimeUtc,
@@ -93,10 +99,10 @@ const entriesController = {
       return;
     }
 
+    res.status(200).json({ message: 'Entry updated', entry: updatedEntry });
+
     // Trigger an SSE event to notify all clients of the user
     sseController.triggerEventForUser(userId);
-
-    res.status(200).json({ message: 'Entry updated', entry: updatedEntry });
   }),
 
   /**

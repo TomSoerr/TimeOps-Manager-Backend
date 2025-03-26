@@ -61,7 +61,7 @@ const sseController = {
     const userClients = clients.get(userId);
     if (userClients) {
       userClients.forEach((client) => {
-        client.write(`event: data-update\n`);
+        client.write(`event: data-update\ndata: {}\n\n`);
       });
     }
   },
