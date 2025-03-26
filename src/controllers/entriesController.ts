@@ -34,7 +34,9 @@ const entriesController = {
   createEntry: expressAsyncHandler(async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      res.status(400).json({ message: 'Error creating entry', errors });
+      res
+        .status(400)
+        .json({ message: 'Error creating entry', errors: errors.array() });
       return;
     }
 
@@ -42,14 +44,22 @@ const entriesController = {
     const { name, startTimeUtc, endTimeUtc, tagId } = req.body;
 
     // TODO implement check if entry overlap
-    // errorData.errors?.errors?.[0]?.msg
+    // errorData.errors?.[0]?.msg
 
-    await createEntryForUser(userId, {
-      name,
-      startTimeUtc,
-      endTimeUtc,
-      tagId,
-    });
+    if (
+      await createEntryForUser(userId, {
+        name,
+        startTimeUtc,
+        endTimeUtc,
+        tagId,
+      })
+    ) {
+      res.status(400).json({
+        message: 'Overlapping with over entries',
+        errors: [{ msg: 'overlapping with other entries' }],
+      });
+      return;
+    }
 
     res.status(201).json({ message: 'Entry created' });
 
@@ -83,23 +93,24 @@ const entriesController = {
     const { name, startTimeUtc, endTimeUtc, tagId } = req.body;
 
     // TODO implement check if entry overlap
-    // errorData.errors?.errors?.[0]?.msg
+    // errorData.errors?.[0]?.msg
 
-    const updatedEntry = await updateEntryForUser(userId, entryId, {
-      name,
-      startTimeUtc,
-      endTimeUtc,
-      tagId,
-    });
-
-    if (!updatedEntry) {
-      res.status(404).json({
-        message: 'Entry not found or you do not have permission to update it',
+    if (
+      await updateEntryForUser(userId, entryId, {
+        name,
+        startTimeUtc,
+        endTimeUtc,
+        tagId,
+      })
+    ) {
+      res.status(400).json({
+        message: 'Overlapping with over entries or invalid id',
+        errors: [{ msg: 'overlapping with other entries or invalid id' }],
       });
       return;
     }
 
-    res.status(200).json({ message: 'Entry updated', entry: updatedEntry });
+    res.status(200).json({ message: 'Entry updated' });
 
     // Trigger an SSE event to notify all clients of the user
     sseController.triggerEventForUser(userId);

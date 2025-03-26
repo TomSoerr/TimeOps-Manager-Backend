@@ -37,7 +37,7 @@ const tagsController = {
     if (!errors.isEmpty()) {
       res
         .status(400)
-        .json({ message: 'Error creating entry', errors: errors.array() });
+        .json({ message: 'Error creating tag', errors: errors.array() });
       return;
     }
 
@@ -67,7 +67,7 @@ const tagsController = {
     if (!errors.isEmpty()) {
       res
         .status(400)
-        .json({ message: 'Error updating entry', errors: errors.array() });
+        .json({ message: 'Error updating tag', errors: errors.array() });
       return;
     }
 
