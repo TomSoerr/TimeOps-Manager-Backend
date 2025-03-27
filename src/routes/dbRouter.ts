@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import dbController from '../controllers/dbController';
+import multer from 'multer';
 
 /**
  * The `dbRouter` handles routes related to database operations,
@@ -8,9 +9,14 @@ import dbController from '../controllers/dbController';
  * @category Routers
  */
 const dbRouter = Router();
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+  },
+});
 
-dbRouter.post('/', dbController.importDb); // import csv (toggle) and json (tom)
+dbRouter.post('/', upload.single('file'), dbController.importDb);
 dbRouter.get('/', dbController.exportDb);
-dbRouter.get('/seed', dbController.seedDb);
 
 export default dbRouter;

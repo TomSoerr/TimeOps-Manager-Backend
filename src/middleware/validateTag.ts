@@ -21,8 +21,8 @@ const validateTag = [
     .trim()
     .isString()
     .withMessage('name must be a string')
-    .isLength({ min: 2, max: 12 })
-    .withMessage('hame must have a length between 2 and 12'),
+    .isLength({ min: 2, max: 20 })
+    .withMessage('hame must have a length between 2 and 20'),
 
   body('color')
     .optional()

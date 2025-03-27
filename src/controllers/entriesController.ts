@@ -92,9 +92,6 @@ const entriesController = {
 
     const { name, startTimeUtc, endTimeUtc, tagId } = req.body;
 
-    // TODO implement check if entry overlap
-    // errorData.errors?.[0]?.msg
-
     if (
       await updateEntryForUser(userId, entryId, {
         name,

@@ -23,8 +23,14 @@ import sseRouter from './sseRouter';
  */
 const apiRouter: Router = Router();
 
-// Parse JSON body in requests
-apiRouter.use(express.json());
+// Parse JSON body for all routes EXCEPT /db
+apiRouter.use((req, res, next) => {
+  // Skip JSON parsing for the /db route
+  if (req.path.startsWith('/db')) {
+    return next();
+  }
+  express.json()(req, res, next);
+});
 
 // Apply authentication middleware
 apiRouter.use(authMiddleware);
