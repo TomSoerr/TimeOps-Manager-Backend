@@ -1,5 +1,5 @@
 import expressAsyncHandler from 'express-async-handler';
-import InternalError from '../errors/internalError';
+import { getAnalyticsData } from '../models/analyticsModel';
 
 /**
  * Controller for managing analytics.
@@ -16,31 +16,23 @@ const dbController = {
    
    */
   getAnalytics: expressAsyncHandler(async (req, res) => {
-    res.json({ message: 'Imported CSV/JSON to DB' });
-  }),
-
-  /**
-   * Get analytics data as a PDF report.
-   *
-   * @param req - The Express request object.
-   * @param res - The Express response object.
-   *
-   
-   */
-  getAnalyticsPdf: expressAsyncHandler(async (req, res) => {
-    try {
-      const pdfPath = '/path/to/your/generated/report.pdf';
-
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader(
-        'Content-Disposition',
-        'attachment; filename="analytics-report.pdf"',
-      );
-
-      res.sendFile(pdfPath, { root: process.cwd() });
-    } catch (error) {
-      throw new InternalError(`Error generating PDF: ${error}`);
+    // Get UTC offset (in minutes) from header
+    const utcOffsetHeader = req.headers['x-utc-offset'];
+    const utcOffset =
+      utcOffsetHeader ? parseInt(utcOffsetHeader.toString(), 10) : 0;
+    if (isNaN(utcOffset)) {
+      res.status(400).json({
+        message: 'Invalid UTC offset provided in X-UTC-Offset header',
+      });
+      return;
     }
+
+    // Assume userId is set from authentication middleware
+    const userId = req.userId;
+    console.log('before calculation');
+    const analytics = await getAnalyticsData(userId, utcOffset);
+    console.log('after calculation');
+    res.json(analytics);
   }),
 };
 

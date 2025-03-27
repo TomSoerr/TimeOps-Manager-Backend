@@ -1,5 +1,6 @@
 import prisma from '../client';
 import { Color } from '@prisma/client';
+import { SECONDS_PER_MONTH } from './analyticsModel';
 
 /**
  * Retrieves the user ID associated with the provided API token.
@@ -27,8 +28,12 @@ export async function getUserIdFromToken(
  * @returns A list of entries for the user.
  */
 export async function getEntriesForUser(userId: number) {
+  const cutOff = Date.now() / 1000 - SECONDS_PER_MONTH * 3; // limit to 3 months
   return await prisma.entry.findMany({
-    where: { userId },
+    where: {
+      userId,
+      startTimeUtc: { gte: cutOff },
+    },
     orderBy: { startTimeUtc: 'desc' },
   });
 }
