@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import tagsController from '../controllers/tagsController';
-import validateTag from '../middleware/validateTag';
+import validateTag from '../middleware/tagValidator';
 
 /**
  * The `tagsRouter` handles routes related to tag management.

@@ -41,7 +41,7 @@ const sumByInterval = (
 
     // sum working hours in interval
     result.push({
-      label: new Date(currentStart * 1000 - offset * 1000).toUTCString(), // TODO offset
+      label: new Date(currentStart * 1000 - offset * 1000).toUTCString(),
       value: HHMM(
         entriesInInterval.reduce(
           (prev, curr) => prev + (curr.endTimeUtc - curr.startTimeUtc),

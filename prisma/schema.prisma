@@ -23,27 +23,38 @@ model User {
   id        Int      @id @default(autoincrement()) 
   apiToken  String   @unique                      
   entries   Entry[]                               
-  tags      Tag[]                                 // Relation to tags
+  tags      Tag[]                                
+  runningEntry  RunningEntry?
 }
 
 model Entry {
-  id          Int      @id @default(autoincrement())  
+  id          Int      @id @default(autoincrement())
   name        String       
   startTimeUtc Int
   endTimeUtc   Int     
   tagId       Int
-  tag         Tag      @relation(fields: [tagId], references: [id])                    
+  tag         Tag      @relation(fields: [tagId], references: [id])
   createdAt   DateTime @default(now())
   editedAt    DateTime @updatedAt
-  userId      Int                                   
+  userId      Int
   user        User     @relation(fields: [userId], references: [id])
 }
 
+model RunningEntry {
+  userId        Int      @id
+  user          User     @relation(fields: [userId], references: [id])
+  name          String
+  startTimeUtc  Int
+  tagId         Int
+  tag           Tag      @relation(fields: [tagId], references: [id])
+}
+
 model Tag {
-  id        Int      @id @default(autoincrement()) 
+  id        Int      @id @default(autoincrement())
   name      String
-  color     Color    @default(slate)  
+  color     Color    @default(slate)
   entries   Entry[]            
-  userId    Int                                   // Foreign key to User
-  user      User     @relation(fields: [userId], references: [id]) // Relation to User
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  runningEntries RunningEntry[]
 }

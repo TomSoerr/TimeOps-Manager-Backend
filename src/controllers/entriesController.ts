@@ -6,6 +6,12 @@ import {
   deleteAllEntriesForUser,
   getEntriesForUser,
 } from '../models/userModel';
+import {
+  getRunningEntryForUser,
+  startRunningEntryForUser,
+  deleteRunningEntryForUser,
+} from '../models/runningModel';
+
 import sseController from './sseController';
 
 /**
@@ -120,7 +126,20 @@ const entriesController = {
    * @param res - The Express response object.
    */
   getRunningEntry: expressAsyncHandler(async (req, res) => {
-    res.json({ message: 'Get running entry' });
+    const userId = req.userId;
+    const runningEntry = await getRunningEntryForUser(userId);
+
+    if (!runningEntry) {
+      res
+        .status(200)
+        .json({ message: 'No running entry found', runningEntry: null });
+      return;
+    }
+
+    res.status(200).json({
+      message: 'Running entry fetched successfully',
+      runningEntry,
+    });
   }),
 
   /**
@@ -130,17 +149,52 @@ const entriesController = {
    * @param res - The Express response object.
    */
   startRunningEntry: expressAsyncHandler(async (req, res) => {
-    res.status(201).json({ message: 'Running entry started' });
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({
+        message: 'Error starting running entry',
+        errors: errors.array(),
+      });
+      return;
+    }
+
+    const userId = req.userId;
+    const { name, startTimeUtc, tagId } = req.body;
+
+    const runningEntry = await startRunningEntryForUser(userId, {
+      name,
+      startTimeUtc,
+      tagId,
+    });
+
+    res.status(201).json({
+      message: 'Running entry started',
+      runningEntry,
+    });
+
+    // Notify clients of the change
+    sseController.triggerEventForUser(userId);
   }),
 
   /**
-   * End the currently running entry.
+   * Delete the currently running entry without completing it.
    *
    * @param req - The Express request object.
    * @param res - The Express response object.
    */
-  endRunningEntry: expressAsyncHandler(async (req, res) => {
-    res.json({ message: 'Running entry ended' });
+  deleteRunningEntry: expressAsyncHandler(async (req, res) => {
+    const userId = req.userId;
+    const deleted = await deleteRunningEntryForUser(userId);
+
+    if (!deleted) {
+      res.status(404).json({ message: 'No running entry found' });
+      return;
+    }
+
+    res.status(200).json({ message: 'Running entry deleted successfully' });
+
+    // Notify clients of the change
+    sseController.triggerEventForUser(userId);
   }),
 
   deleteAllEntries: expressAsyncHandler(async (req, res) => {

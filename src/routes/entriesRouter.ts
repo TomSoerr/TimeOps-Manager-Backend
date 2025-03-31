@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import entriesController from '../controllers/entriesController';
 import validateEntry from '../middleware/entryValidator';
+import validateRunningEntry from '../middleware/runningEntryValidator';
 
 /**
  * The `entriesRouter` handles all routes related to time entries.
@@ -19,7 +20,11 @@ entriesRouter.delete('/', entriesController.deleteAllEntries);
 
 // Running Entry
 entriesRouter.get('/running', entriesController.getRunningEntry);
-entriesRouter.post('/running', entriesController.startRunningEntry);
-entriesRouter.put('/running', entriesController.endRunningEntry);
+entriesRouter.post(
+  '/running',
+  validateRunningEntry,
+  entriesController.startRunningEntry,
+);
+entriesRouter.delete('/running', entriesController.deleteRunningEntry);
 
 export default entriesRouter;
