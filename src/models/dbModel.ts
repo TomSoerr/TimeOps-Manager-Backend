@@ -2,7 +2,7 @@ import csv from 'csv-parser';
 import { Readable } from 'stream';
 import prisma from '../client';
 import { Color } from '@prisma/client';
-import { findOverlappingEntry } from './userModel';
+import { findOverlappingEntry } from './entryModel';
 
 export interface ImportData {
   name: string;
@@ -15,11 +15,16 @@ export interface ImportData {
 }
 
 /**
- * Parse CSV content into structured data
+ * Parse CSV content into structured data.
  *
- * @param content - The CSV content as a string
- * @param timezoneOffset - The timezone offset in minutes
- * @returns Parsed entries with tag information
+ * This function reads CSV content, extracts relevant fields, and converts
+ * them into a structured format suitable for database import. It also
+ * calculates UTC timestamps for start and end times based on the provided
+ * timezone offset.
+ *
+ * @param content - The CSV content as a string.
+ * @param timezoneOffset - The timezone offset in minutes.
+ * @returns A promise that resolves to an array of parsed entries with tag information.
  */
 export async function parseCSV(
   content: string,
@@ -75,12 +80,15 @@ export async function parseCSV(
 }
 
 /**
- * Convert date and time strings to UTC timestamp
+ * Convert date and time strings to a UTC timestamp.
  *
- * @param dateStr - Date string in YYYY-MM-DD format
- * @param timeStr - Time string in HH:MM:SS format
- * @param timezoneOffset - The timezone offset in seconds
- * @returns UTC timestamp in seconds
+ * This function parses date and time strings, creates a UTC date object,
+ * and adjusts it based on the provided timezone offset.
+ *
+ * @param dateStr - Date string in YYYY-MM-DD format.
+ * @param timeStr - Time string in HH:MM:SS format.
+ * @param timezoneOffset - The timezone offset in seconds.
+ * @returns A UTC timestamp in seconds, or null if parsing fails.
  */
 function dateTimeToUtcTimestamp(
   dateStr: string,
@@ -93,12 +101,12 @@ function dateTimeToUtcTimestamp(
     const [year, month, day] = dateStr.split('-').map(Number);
     const [hours, minutes, seconds] = timeStr.split(':').map(Number);
 
-    // create date in UTC because exported Toggle date is in current timezone
+    // Create date in UTC because exported Toggle date is in current timezone
     const date = new Date(
       Date.UTC(year, month - 1, day, hours, minutes, seconds),
     );
 
-    // then remove the clients time zone
+    // Then remove the client's timezone
     return Math.floor(date.getTime() / 1000) + timezoneOffset;
   } catch (error) {
     console.error('Error parsing date/time:', error);
@@ -107,11 +115,15 @@ function dateTimeToUtcTimestamp(
 }
 
 /**
- * Process the imported data by creating tags and entries
+ * Process the imported data by creating tags and entries.
  *
- * @param userId - The ID of the user importing the data
- * @param data - The parsed import data
- * @returns Summary of the import operation
+ * This function processes parsed import data, creates tags if they do not
+ * already exist, and creates time entries for the user. It also checks for
+ * overlapping entries and logs errors for any issues encountered.
+ *
+ * @param userId - The ID of the user importing the data.
+ * @param data - The parsed import data.
+ * @returns A summary of the import operation, including counts of created tags and entries, and any errors.
  */
 export async function processImportData(userId: number, data: ImportData[]) {
   const tagMap = new Map<string, number>(); // Map to track tag names to IDs
@@ -213,10 +225,13 @@ export async function processImportData(userId: number, data: ImportData[]) {
 }
 
 /**
- * Export all entries for a user in the ImportData format
+ * Export all entries for a user in the ImportData format.
  *
- * @param userId - The ID of the user whose entries to export
- * @returns An array of entries formatted as ImportData
+ * This function retrieves all entries for a user, including their associated
+ * tags, and formats them for export.
+ *
+ * @param userId - The ID of the user whose entries to export.
+ * @returns An array of entries formatted as ImportData.
  */
 export async function exportEntriesForUser(
   userId: number,

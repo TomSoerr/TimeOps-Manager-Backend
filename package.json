@@ -10,7 +10,7 @@
     "build": "tsc",
     "start": "node dist/app.js",
     "test": "jest",
-    "docs:gen": "npx typedoc && rm -rf TimeOps-Manager-Backend.wiki/classes TimeOps-Manager-Backend.wiki/variables && mv tmp/* TimeOps-Manager-Backend.wiki/ && rm -rf tmp && rm TimeOps-Manager-Backend.wiki/README.md"
+    "docs:gen": "npx typedoc && rm -rf TimeOps-Manager-Backend.wiki/classes TimeOps-Manager-Backend.wiki/variables TimeOps-Manager-Backend.wiki/interfaces && mv tmp/* TimeOps-Manager-Backend.wiki/ && rm -rf tmp && rm TimeOps-Manager-Backend.wiki/README.md"
   },
   "dependencies": {
     "@prisma/client": "^6.5.0",

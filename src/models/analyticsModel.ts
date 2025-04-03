@@ -15,12 +15,28 @@ type EntryWithTag = Entry & {
   tag: Tag | null;
 };
 
+/**
+ * Converts a duration in seconds to a formatted string in HH:MM format.
+ *
+ * @param seconds - The duration in seconds.
+ * @returns A string representing the duration in HH:MM format.
+ */
 const HHMM = (seconds: number): string => {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
 };
 
+/**
+ * Sums working hours for entries grouped by a specific time interval.
+ *
+ * @param entries - The list of entries to process.
+ * @param start - The starting timestamp for the interval.
+ * @param interval - The duration of each interval in seconds.
+ * @param max - The maximum number of intervals to process.
+ * @param offset - The UTC offset in seconds.
+ * @returns An array of rows containing labels and summed values for each interval.
+ */
 const sumByInterval = (
   entries: EntryWithTag[],
   start: number,
@@ -34,12 +50,12 @@ const sumByInterval = (
   let cutOff = max;
 
   while (entries.length > 0 && cutOff > 0) {
-    // get values greater than current start
+    // Get entries within the current interval
     const entriesInInterval = currentEntries.filter(
       (entry) => entry.startTimeUtc >= currentStart,
     );
 
-    // sum working hours in interval
+    // Sum working hours in the interval
     result.push({
       label: new Date(currentStart * 1000 - offset * 1000).toUTCString(),
       value: HHMM(
@@ -50,7 +66,7 @@ const sumByInterval = (
       ),
     });
 
-    // remove entries from current interval
+    // Remove entries from the current interval
     currentEntries = entries.filter(
       (entry) => entry.startTimeUtc < currentStart,
     );
@@ -62,8 +78,13 @@ const sumByInterval = (
   return result;
 };
 
+/**
+ * Groups entries by tags and calculates the total working hours for each tag.
+ *
+ * @param entries - The list of entries to process.
+ * @returns An array of rows containing tag names and their corresponding working hours.
+ */
 const getTagsWithWorkingHours = (entries: EntryWithTag[]): Row[] => {
-  // Group entries by tagId
   const tagGroups = new Map<
     number,
     {
@@ -104,6 +125,13 @@ const getTagsWithWorkingHours = (entries: EntryWithTag[]): Row[] => {
     .map((entry) => ({ label: entry.name, value: entry.hours }));
 };
 
+/**
+ * Retrieves analytics data for a user, including daily, weekly, monthly, and tag-based summaries.
+ *
+ * @param userId - The ID of the user for whom analytics data is being retrieved.
+ * @param utcOffset - The UTC offset in seconds.
+ * @returns An object containing analytics data grouped by day, week, month, and tags.
+ */
 export async function getAnalyticsData(userId: number, utcOffset: number) {
   // Fetch entries including their associated tag
   const entries = await prisma.entry.findMany({
@@ -115,7 +143,7 @@ export async function getAnalyticsData(userId: number, utcOffset: number) {
   // Get current time in unix epoch seconds (UTC)
   const nowInSeconds = Math.floor(Date.now() / 1000);
 
-  // start of the week should be monday (0 is sunday)
+  // Calculate start times for day, week, and month intervals
   const currentDayOfWeek = new Date().getDay();
   const daysWeekSubtract = (currentDayOfWeek + 6) % 7;
   const daysMonthSubtract = new Date().getDay();
@@ -134,6 +162,7 @@ export async function getAnalyticsData(userId: number, utcOffset: number) {
     daysMonthSubtract * SECONDS_PER_DAY +
     utcOffset;
 
+  // Calculate daily, weekly, and monthly summaries
   let daysSum = sumByInterval(
     entries,
     dayStart,
@@ -170,6 +199,7 @@ export async function getAnalyticsData(userId: number, utcOffset: number) {
     label: `${row.label.split(' ')[2]}. ${row.label.split(' ')[3]}`,
   }));
 
+  // Calculate tag-based summaries
   const tagsSummary = getTagsWithWorkingHours(entries);
 
   return {

@@ -1,10 +1,13 @@
 import prisma from '../client';
 
 /**
- * Get the currently running entry for a user
+ * Retrieves the currently running entry for a user.
  *
- * @param userId - The ID of the user
- * @returns The running entry or null if there isn't one
+ * This function fetches the running entry associated with the specified user.
+ * If no running entry exists, it returns `null`.
+ *
+ * @param userId - The ID of the user.
+ * @returns The running entry or `null` if there isn't one.
  */
 export async function getRunningEntryForUser(userId: number) {
   return await prisma.runningEntry.findUnique({
@@ -13,12 +16,15 @@ export async function getRunningEntryForUser(userId: number) {
 }
 
 /**
- * Start a new running entry for a user
- * If the user already has a running entry, it will be replaced
+ * Starts a new running entry for a user.
  *
- * @param userId - The ID of the user
- * @param entryData - The data for the new running entry
- * @returns The created running entry
+ * This function deletes any existing running entry for the user and creates
+ * a new one with the provided data. The new running entry is associated with
+ * the specified user.
+ *
+ * @param userId - The ID of the user.
+ * @param entryData - The data for the new running entry.
+ * @returns The created running entry.
  */
 export async function startRunningEntryForUser(
   userId: number,
@@ -44,17 +50,20 @@ export async function startRunningEntryForUser(
 }
 
 /**
- * Delete the running entry for a user without creating a completed entry
+ * Deletes the running entry for a user without creating a completed entry.
  *
- * @param userId - The ID of the user
- * @returns True if an entry was deleted, false if no entry existed
+ * This function removes the running entry associated with the specified user
+ * from the database. It does not create a completed entry.
+ *
+ * @param userId - The ID of the user.
+ * @returns The number of deleted items (0 or 1).
  */
 export async function deleteRunningEntryForUser(
   userId: number,
-): Promise<boolean> {
+): Promise<number> {
   const result = await prisma.runningEntry.deleteMany({
     where: { userId },
   });
 
-  return result.count > 0;
+  return result.count;
 }

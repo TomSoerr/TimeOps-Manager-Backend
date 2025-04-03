@@ -5,17 +5,14 @@ import {
   updateEntryForUser,
   deleteAllEntriesForUser,
   getEntriesForUser,
-} from '../models/userModel';
-import {
-  getRunningEntryForUser,
-  startRunningEntryForUser,
-  deleteRunningEntryForUser,
-} from '../models/runningModel';
-
+} from '../models/entryModel';
 import sseController from './sseController';
 
 /**
  * Controller for managing entries.
+ *
+ * This controller provides endpoints for managing time entries, including
+ * creating, updating, deleting, and retrieving entries.
  *
  * @category Controllers
  */
@@ -23,7 +20,11 @@ const entriesController = {
   /**
    * Get entries for the last 3 months.
    *
-   * @param req - The Express request object.
+   * This function retrieves all time entries for the authenticated user
+   * within the last 3 months. The entries are sorted in descending order
+   * by their start time.
+   *
+   * @param req - The Express request object. Assumes `userId` is set by the authentication middleware.
    * @param res - The Express response object.
    */
   getEntries: expressAsyncHandler(async (req, res) => {
@@ -34,7 +35,10 @@ const entriesController = {
   /**
    * Create a new entry.
    *
-   * @param req - The Express request object.
+   * This function validates the request body, checks for overlapping entries,
+   * and creates a new time entry for the authenticated user.
+   *
+   * @param req - The Express request object. Assumes `userId` is set by the authentication middleware.
    * @param res - The Express response object.
    */
   createEntry: expressAsyncHandler(async (req, res) => {
@@ -46,11 +50,8 @@ const entriesController = {
       return;
     }
 
-    const userId = req.userId; // Retrieved from the auth middleware
+    const userId = req.userId;
     const { name, startTimeUtc, endTimeUtc, tagId } = req.body;
-
-    // TODO implement check if entry overlap
-    // errorData.errors?.[0]?.msg
 
     if (
       await createEntryForUser(userId, {
@@ -61,8 +62,8 @@ const entriesController = {
       })
     ) {
       res.status(400).json({
-        message: 'Overlapping with over entries',
-        errors: [{ msg: 'overlapping with other entries' }],
+        message: 'Overlapping with other entries',
+        errors: [{ msg: 'Overlapping with other entries' }],
       });
       return;
     }
@@ -76,7 +77,10 @@ const entriesController = {
   /**
    * Update an entry.
    *
-   * @param req - The Express request object.
+   * This function validates the request body, checks for overlapping entries,
+   * and updates an existing time entry for the authenticated user.
+   *
+   * @param req - The Express request object. Assumes `userId` is set by the authentication middleware.
    * @param res - The Express response object.
    */
   updateEntry: expressAsyncHandler(async (req, res) => {
@@ -107,8 +111,8 @@ const entriesController = {
       })
     ) {
       res.status(400).json({
-        message: 'Overlapping with over entries or invalid id',
-        errors: [{ msg: 'overlapping with other entries or invalid id' }],
+        message: 'Overlapping with other entries or invalid ID',
+        errors: [{ msg: 'Overlapping with other entries or invalid ID' }],
       });
       return;
     }
@@ -120,83 +124,14 @@ const entriesController = {
   }),
 
   /**
-   * Get the currently running entry, if available.
+   * Delete all entries for the authenticated user.
    *
-   * @param req - The Express request object.
+   * This function deletes all time entries for the authenticated user.
+   * It also triggers an SSE event to notify clients of the change.
+   *
+   * @param req - The Express request object. Assumes `userId` is set by the authentication middleware.
    * @param res - The Express response object.
    */
-  getRunningEntry: expressAsyncHandler(async (req, res) => {
-    const userId = req.userId;
-    const runningEntry = await getRunningEntryForUser(userId);
-
-    if (!runningEntry) {
-      res
-        .status(200)
-        .json({ message: 'No running entry found', runningEntry: null });
-      return;
-    }
-
-    res.status(200).json({
-      message: 'Running entry fetched successfully',
-      runningEntry,
-    });
-  }),
-
-  /**
-   * Start a new running entry.
-   *
-   * @param req - The Express request object.
-   * @param res - The Express response object.
-   */
-  startRunningEntry: expressAsyncHandler(async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      res.status(400).json({
-        message: 'Error starting running entry',
-        errors: errors.array(),
-      });
-      return;
-    }
-
-    const userId = req.userId;
-    const { name, startTimeUtc, tagId } = req.body;
-
-    const runningEntry = await startRunningEntryForUser(userId, {
-      name,
-      startTimeUtc,
-      tagId,
-    });
-
-    res.status(201).json({
-      message: 'Running entry started',
-      runningEntry,
-    });
-
-    // Notify clients of the change
-    sseController.triggerEventForUser(userId);
-  }),
-
-  /**
-   * Delete the currently running entry without completing it.
-   *
-   * @param req - The Express request object.
-   * @param res - The Express response object.
-   */
-  deleteRunningEntry: expressAsyncHandler(async (req, res) => {
-    const userId = req.userId;
-    const deleted = await deleteRunningEntryForUser(userId);
-
-    if (!deleted) {
-      res.status(404).json({ message: 'No running entry found' });
-      return;
-    }
-
-    res.status(200).json({ message: 'Running entry deleted successfully' });
-
-    // Notify clients of the change
-    sseController.triggerEventForUser(userId);
-  }),
-
   deleteAllEntries: expressAsyncHandler(async (req, res) => {
     const userId = req.userId;
     await deleteAllEntriesForUser(userId);

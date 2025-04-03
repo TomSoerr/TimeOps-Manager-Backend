@@ -10,32 +10,49 @@ import sseRouter from './sseRouter';
 
 /**
  * Main API router for the application.
- * Mounts the following sub-routers:
- * - entries
- * - tags
- * - db
- * - user
- * - events
  *
- * The API router itself is mounted to `/api/v1`
+ * This router serves as the entry point for all API routes. It mounts
+ * sub-routers for different features, such as entries, tags, analytics,
+ * database operations, user management, and Server-Sent Events (SSE).
+ *
+ * The API router itself is mounted to `/api/v1`.
  *
  * @category Routers
  */
 const apiRouter: Router = Router();
 
-// Parse JSON body for all routes EXCEPT /db
+/**
+ * Middleware to parse JSON bodies for all routes except `/db`.
+ *
+ * The `/db` route is excluded because it handles file uploads, which
+ * require a different parsing mechanism (e.g., `multer`).
+ */
 apiRouter.use((req, res, next) => {
-  // Skip JSON parsing for the /db route
   if (req.path.startsWith('/db')) {
     return next();
   }
   express.json()(req, res, next);
 });
 
-// Apply authentication middleware
+/**
+ * Middleware to apply authentication to all routes.
+ *
+ * This middleware ensures that only authenticated users can access
+ * the API routes. The authentication logic is handled by the
+ * `authMiddleware`.
+ */
 apiRouter.use(authMiddleware);
 
-// Mount sub-routers
+/**
+ * Mount sub-routers for different features.
+ *
+ * - `/entries`: Routes for managing time entries.
+ * - `/tags`: Routes for managing tags.
+ * - `/analytics`: Routes for retrieving analytics data.
+ * - `/db`: Routes for database import/export operations.
+ * - `/user`: Routes for user management.
+ * - `/events`: Routes for Server-Sent Events (SSE).
+ */
 apiRouter.use('/entries', entriesRouter);
 apiRouter.use('/tags', tagsRouter);
 apiRouter.use('/analytics', analyticsRouter);

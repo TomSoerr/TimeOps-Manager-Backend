@@ -4,9 +4,14 @@ import { body } from 'express-validator';
  * Array of Express Validator middleware to validate the request body
  * when creating or updating a tag entry.
  *
+ * This middleware ensures that the required fields are present, properly formatted,
+ * and meet the application's validation rules. It checks for valid IDs, names,
+ * and colors.
+ *
  * @category Validators
  */
 const validateTag = [
+  // Validate the optional `id` field
   body('id')
     .optional()
     .custom((value) => {
@@ -17,13 +22,15 @@ const validateTag = [
       return true;
     }),
 
+  // Validate the `name` field
   body('name')
     .trim()
     .isString()
     .withMessage('name must be a string')
     .isLength({ min: 2, max: 20 })
-    .withMessage('hame must have a length between 2 and 20'),
+    .withMessage('name must have a length between 2 and 20'),
 
+  // Validate the optional `color` field
   body('color')
     .optional()
     .isString()

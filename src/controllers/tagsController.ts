@@ -3,22 +3,26 @@ import {
   getTagsForUser,
   createTagForUser,
   updateTagForUser,
-} from '../models/userModel';
+} from '../models/tagModel';
 import { validationResult } from 'express-validator';
 import sseController from './sseController';
 
 /**
  * Controller for managing tags.
  *
+ * This controller provides endpoints for managing tags, including
+ * retrieving, creating, and updating tags for the authenticated user.
+ *
  * @category Controllers
  */
 const tagsController = {
   /**
-   * Get all tags.
+   * Get all tags for the authenticated user.
    *
-   * @param req - The Express request object.
+   * This function retrieves all tags associated with the authenticated user.
+   *
+   * @param req - The Express request object. Assumes `userId` is set by the authentication middleware.
    * @param res - The Express response object.
-   *
    */
   getTags: expressAsyncHandler(async (req, res) => {
     const tags = await getTagsForUser(req.userId);
@@ -26,11 +30,13 @@ const tagsController = {
   }),
 
   /**
-   * Create a new tag.
+   * Create a new tag for the authenticated user.
    *
-   * @param req - The Express request object.
+   * This function validates the request body and creates a new tag
+   * for the authenticated user. If validation fails, it returns an error.
+   *
+   * @param req - The Express request object. Assumes `userId` is set by the authentication middleware.
    * @param res - The Express response object.
-   *
    */
   createTag: expressAsyncHandler(async (req, res) => {
     const errors = validationResult(req);
@@ -56,11 +62,14 @@ const tagsController = {
   }),
 
   /**
-   * Update a tag.
+   * Update an existing tag for the authenticated user.
    *
-   * @param req - The Express request object.
+   * This function validates the request body and updates an existing tag
+   * for the authenticated user. If the tag does not exist or the user does
+   * not have permission to update it, an error is returned.
+   *
+   * @param req - The Express request object. Assumes `userId` is set by the authentication middleware.
    * @param res - The Express response object.
-   *
    */
   updateTag: expressAsyncHandler(async (req, res) => {
     const errors = validationResult(req);
