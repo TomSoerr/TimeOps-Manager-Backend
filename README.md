@@ -6,4 +6,4 @@ You can see a live preview of the frontend
 [here](https://tomsoerr.github.io/TimeOps-Manager-Webapp/) 
 (repository [here](https://github.com/TomSoerr/TimeOps-Manager-Webapp)), 
 but it is currently not connected to the API. The documentation for the API is 
-[here](https://github.com/TomSoerr/TimeOps-Manager-Backend/wiki).
+[here](https://github.com/TomSoerr/TimeOps-Manager-Backend/wiki).#
